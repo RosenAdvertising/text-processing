@@ -3,7 +3,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.6+](https://img.shields.io/badge/python-3.6+-blue.svg)](https://www.python.org/downloads/)
 
-A tool that processes WordPress XML export files and extracts content into a structured CSV format for further processing, tagging, or AI ingestion.
+A tool that processes WordPress XML export files and extracts content into a structured CSV format for further processing, AI ingestion, or content migration.
 
 ## Overview
 
@@ -11,12 +11,18 @@ The processor script (`xml_to_csv.py`) parses WordPress export XML files and ext
 
 - **Title**: The post title
 - **Slug**: The URL-friendly slug of the post
-- **Content**: The main content of the post (cleaned of HTML tags)
+- **Content**: The main content of the post (cleaned of HTML tags and shortcodes)
 - **Date**: The publication date
 - **URL**: The full URL of the post
 - **Status**: Publication status (published, draft, etc.)
 - **Category**: Categories assigned to the post
 - **Tags**: Tags assigned to the post
+
+## Getting the WordPress Export File
+
+In your WordPress admin: **Tools → Export → Posts → Download Export File**
+
+This generates the XML file to place in your `Raw_XML/` directory.
 
 ## Project Structure
 
@@ -70,7 +76,7 @@ python xml_to_csv.py --input-dir /path/to/xml/files --output-file /path/to/outpu
 |----------|------------------------------------------------|
 | Title    | Post title                                     |
 | Slug     | URL-friendly post name                         |
-| Content  | Cleaned post content (HTML tags removed)       |
+| Content  | Cleaned post content (HTML and shortcodes removed) |
 | Date     | Publication date (YYYY-MM-DD format)           |
 | URL      | Full post URL                                  |
 | Status   | Publication status (published, draft, etc.)    |
@@ -81,7 +87,9 @@ python xml_to_csv.py --input-dir /path/to/xml/files --output-file /path/to/outpu
 
 - Only processes items with `post_type` set to `post` (skips pages, attachments, etc.)
 - HTML tags are stripped from content; HTML entities are decoded
+- WordPress shortcodes (e.g. `[gallery]`, `[caption]`) are removed from content
 - Categories and tags are extracted as comma-separated lists
+- Multiple XML files in `Raw_XML/` are processed in alphabetical order
 
 ## License
 
