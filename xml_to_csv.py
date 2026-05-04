@@ -8,6 +8,8 @@ with columns: Title, Slug, Content, Date, URL, Status, Category, Tags
 
 import os
 import csv
+import sys
+import tempfile
 import xml.etree.ElementTree as ET
 import re
 from html import unescape
@@ -17,9 +19,9 @@ from datetime import datetime
 
 def clean_content(content):
     """Strip HTML tags, WordPress shortcodes, and normalize whitespace."""
-    content = re.sub(r'\[\/?\w[^\]]*\]', ' ', content)  # remove WP shortcodes
-    content = re.sub(r'<[^>]+>', ' ', content)           # remove HTML tags
-    content = unescape(content)                           # decode HTML entities
+    content = unescape(content)                                    # decode entities first
+    content = re.sub(r'\[\/?\w[^\]]*\]', ' ', content)  # remove WP shortcodes (letter-start only via \w after unescape)
+    content = re.sub(r'<[a-zA-Z/][^>]*>', ' ', content)           # remove HTML tags (must start with letter or /)
     content = re.sub(r'\s+', ' ', content).strip()
     return content
 
@@ -105,17 +107,30 @@ def main():
     args = parser.parse_args()
 
     if not os.path.isdir(args.input_dir):
-        print(f"Error: Input directory {args.input_dir} does not exist")
-        return
+        print(f"Error: Input directory {args.input_dir} does not exist", file=sys.stderr)
+        sys.exit(1)
 
-    with open(args.output_file, 'w', newline='', encoding='utf-8') as csvfile:
-        fieldnames = ['Title', 'Slug', 'Content', 'Date', 'URL', 'Status', 'Category', 'Tags']
-        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
-        writer.writeheader()
+    xml_files = sorted(f for f in os.listdir(args.input_dir) if f.endswith('.xml'))
+    if not xml_files:
+        print(f"No XML files found in {args.input_dir}", file=sys.stderr)
+        sys.exit(1)
 
-        for filename in sorted(os.listdir(args.input_dir)):
-            if filename.endswith('.xml'):
-                process_xml_file(os.path.join(args.input_dir, filename), writer)
+    fieldnames = ['Title', 'Slug', 'Content', 'Date', 'URL', 'Status', 'Category', 'Tags']
+    tmp_fd, tmp_path = tempfile.mkstemp(dir=os.path.dirname(args.output_file), suffix='.csv.tmp')
+    try:
+        with os.fdopen(tmp_fd, 'w', newline='', encoding='utf-8') as csvfile:
+            writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+            writer.writeheader()
+            for filename in xml_files:
+                try:
+                    process_xml_file(os.path.join(args.input_dir, filename), writer)
+                except Exception as e:
+                    print(f"Warning: skipping {filename}: {e}", file=sys.stderr)
+
+        os.replace(tmp_path, args.output_file)
+    except Exception:
+        os.unlink(tmp_path)
+        raise
 
     print(f"Processing complete. Output saved to {args.output_file}")
 
