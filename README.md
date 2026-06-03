@@ -26,7 +26,7 @@ This generates the XML file to place in your `Raw_XML/` directory.
 
 ## Project Structure
 
-```
+```text
 text-processing/
 ├── LICENSE           # MIT License
 ├── README.md         # This documentation file
@@ -61,6 +61,7 @@ python xml_to_csv.py
 ```
 
 By default, the script will:
+
 - Look for XML files in the `Raw_XML/` directory
 - Output the processed data to `processed_content.csv`
 
@@ -72,16 +73,16 @@ python xml_to_csv.py --input-dir /path/to/xml/files --output-file /path/to/outpu
 
 ## Output Format
 
-| Column   | Description                                    |
-|----------|------------------------------------------------|
-| Title    | Post title                                     |
-| Slug     | URL-friendly post name                         |
+| Column   | Description                                        |
+| -------- | -------------------------------------------------- |
+| Title    | Post title                                         |
+| Slug     | URL-friendly post name                             |
 | Content  | Cleaned post content (HTML and shortcodes removed) |
-| Date     | Publication date (YYYY-MM-DD format)           |
-| URL      | Full post URL                                  |
-| Status   | Publication status (published, draft, etc.)    |
-| Category | Comma-separated list of post categories        |
-| Tags     | Comma-separated list of post tags              |
+| Date     | Publication date (YYYY-MM-DD format)               |
+| URL      | Full post URL                                      |
+| Status   | Publication status (published, draft, etc.)        |
+| Category | Comma-separated list of post categories            |
+| Tags     | Comma-separated list of post tags                  |
 
 ## Notes
 
@@ -94,4 +95,3 @@ python xml_to_csv.py --input-dir /path/to/xml/files --output-file /path/to/outpu
 ## License
 
 This project is licensed under the MIT License — see the [LICENSE](LICENSE) file for details.
-
