@@ -140,7 +140,7 @@ def test_process_xml_file_handles_missing_optional_elements(tmp_path):
     path = tmp_path / "minimal.xml"
     path.write_text(
         _feed(
-            f"""
+            """
             <item>
               <wp:post_type>post</wp:post_type>
             </item>
